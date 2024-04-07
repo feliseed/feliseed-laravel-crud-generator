@@ -1,0 +1,17 @@
+{
+	"name": "%%TABLE_NAME%%",
+	"timestamp": "true",
+	"softDeletes": "false",
+	"columns": [
+		{
+			"name": "id",
+			"type": "id",
+			"nullable": "false"
+		},
+		{
+			"name": "title",
+			"type": "string:256",
+			"nullable": "false"
+		}
+	]
+}

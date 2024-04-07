@@ -1,0 +1,25 @@
+{
+    "name": "feliseed/laravel-crud-generator",
+    "description": "CRUD generator for Laravel",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "feliseed",
+            "email": "ishida@feliseed.co.jp"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Feliseed\\LaravelCrudGenerator\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Feliseed\\LaravelCrudGenerator\\CrudGeneratorServiceProvider"
+            ]
+        }
+    }
+}
