@@ -1,58 +1,56 @@
 <?php
 
 namespace Feliseed\LaravelCrudGenerator\Console\Commands\Maker;
+
 use Illuminate\Support\Str;
 use Feliseed\LaravelCrudGenerator\Console\Commands\DatabaseSchema;
-use Feliseed\LaravelCrudGenerator\Console\Commands\Column;
-use PhpParser\Node\Expr\Cast\String_;
 
-class IndexBladeMaker extends FileMaker {
-    public static function getIndexBladeBy(DatabaseSchema $jsonSchema, String $modelName): void {
-        $singular = Str::singular($modelName);
-        $upperSingular = Str::ucfirst($singular);
-        $indexBlade = __DIR__ . '/../../../../templates/resources/views/sample/index.blade.php';
-        $indexBladeFilePath = self::getFilePathOf($modelName);
-        copy($indexBlade, $indexBladeFilePath);
-        self::sedSampleToModelNameNotSnakely($indexBladeFilePath, $upperSingular);
-        self::sedCOLUMNSFor($jsonSchema, $modelName, '%%HEADCOLUMNS%%', [self::class, 'getHEADInsertStrFor']);
-        self::sedCOLUMNSFor($jsonSchema, $modelName, '%%FIRSTCOLUMN%%', [$jsonSchema, 'getFirstColumnNameExceptId']);
+class IndexBladeMaker {
+    public function getIndexBladeBy(DatabaseSchema $jsonSchema, String $modelName): void {
+        
+        $indexBlade = file_get_contents(__DIR__ . '/../../../../stubs/index.blade.stub');
+        
+        // 文字列を置換
+        $indexBlade = str_replace('%%ROUTE_NAME%%', Str::kebab(Str::plural($modelName)), $indexBlade);
+        $indexBlade = str_replace('%%PAGE_TITLE%%', Str::ucfirst(Str::plural($modelName)), $indexBlade);
+        $indexBlade = str_replace(
+            '%%SEARCH_ITEM%%', 
+            Str::lower(Str::singular(
+                collect($jsonSchema->columns)->first(function ($column) {
+                    return $column->name !== 'id';
+                })->name
+            )), 
+            $indexBlade
+        );
+        $indexBlade = str_replace('%%VARIABLE_PLURAL%%', "$".Str::camel(Str::plural($modelName)), $indexBlade);
+        $indexBlade = str_replace('%%VARIABLE_SINGULAR%%', "$".Str::camel(Str::singular($modelName)), $indexBlade);
+        $indexBlade = str_replace('%%TABLE_COLUMNS%%', $this->getTableColumns($jsonSchema), $indexBlade);
+        $indexBlade = str_replace('%%TABLE_ROWS%%', $this->getTableRows($jsonSchema, $modelName), $indexBlade);
 
-        self::sedCOLUMNSForView($jsonSchema, Str::lcfirst(Str::singular($modelName)), '%%BODYCOLUMNS%%', [self::class, 'getBODYInsertStrFor']);
-
+        // publish
+        file_put_contents(
+            "resources/views/". Str::kebab(Str::plural($modelName)) ."/index.blade.php",
+            $indexBlade
+        );
     }
 
-    protected static function getHEADInsertStrOf(Column $column) : String {
-        return "<th scope=\"col\" class=\"py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6\">{$column->name}</th>\n\t\t\t\t\t\t\t\t";
+    protected function getTableColumns(DatabaseSchema $jsonSchema): String {
+        $columns = $jsonSchema->columns;
+        $tableColumns = '';
+        foreach ($columns as $column) {
+            $columnName = Str::camel($column->name);
+            $tableColumns .= "<th scope=\"col\" class=\"py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6\">{$columnName}</th>\n\t\t\t\t\t\t\t\t";
+        }
+        return rtrim($tableColumns, ",\n\t");
     }
 
-    protected static function getHEADInsertStrFor(DatabaseSchema $jsonSchema) : String {
-        $tmp = array_map([self::class, 'getHEADInsertStrOf'], $jsonSchema->columns);
-        return rtrim(implode('', $tmp), ",\n\t");
+    protected function getTableRows(DatabaseSchema $jsonSchema, string $modelName): String {
+        $columns = $jsonSchema->columns;
+        $model = Str::camel(Str::singular($modelName));
+        $tableRows = '';
+        foreach ($columns as $column) {
+            $tableRows .= "<td class=\"whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6\">\n\t\t\t\t\t\t\t\t\t<div class=\"text-gray-900\">{{\${$model}->{$column->name}}}</div>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t";
+        }
+        return rtrim($tableRows, ",\n\t");
     }
-
-    protected static function getBODYInsertStrOf(String $name, Column $column) : String {
-        return "<td class=\"whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6\">\n\t\t\t\t\t\t\t\t\t<div class=\"text-gray-900\">{{\$$name->$column->name}}</div>\n\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t";
-    }
-
-    protected static function getBODYInsertStrFor(DatabaseSchema $jsonSchema, String $modelName) : String {
-        $func = function (Column $column) use ($modelName) {
-            return self::getBODYInsertStrOf($modelName, $column);
-        };
-        $tmp = array_map($func, $jsonSchema->columns);
-        return rtrim(implode('', $tmp), ",\n\t");
-    }
-
-    // protected static function getFirstColumnOf(DatabaseSchema $jsonSchema) : String {
-        // return "<div>
-        // \t\t\t<x-atoms.label for=\"$columnName\" :value=\"__('$columnName')\"/>
-        // \t\t\t<x-atoms.input id=\"$columnName\" class=\"mt-1 w-44\" type=\"text\" name=\"$columnName\" :value=\"request()->get('$columnName')\" autocomplete=\"off\" />
-        // \t\t</div>";
-    // }
-
-    protected static function getFilePathOf(String $tableName): String {
-        $plural = Str::plural($tableName);
-        $chainPlural = Str::snake($plural, '-');
-        return "./resources/views/{$chainPlural}/index.blade.php";
-    }
-
 }

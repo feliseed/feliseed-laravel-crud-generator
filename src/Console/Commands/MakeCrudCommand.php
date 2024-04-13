@@ -109,7 +109,7 @@ class MakeCrudCommand extends Command
         FileMaker::mkdirIfNotExists($modelName);
         CreateBladeMaker::getCreateBladeBy($schema, $modelName);
         EditBladeMaker::getEditBladeBy($schema, $modelName);
-        IndexBladeMaker::getIndexBladeBy($schema, $modelName);
+        (new IndexBladeMaker)->getIndexBladeBy($schema, $modelName);
         ShowBladeMaker::getShowBladeBy($schema, $modelName);
         ControllerMaker::getControllerBy($schema, $modelName);
         ControllerTestMaker::getControllerTestBy($schema, $modelName);
