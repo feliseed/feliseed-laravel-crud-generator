@@ -9,7 +9,10 @@
         }
     ],
     "minimum-stability": "dev",
-    "require": {},
+    "require": {
+        "php": "^8.0",
+        "illuminate/console": "^9.52.16|^10.0|^11.0"
+    },
     "autoload": {
         "psr-4": {
             "Feliseed\\LaravelCrudGenerator\\": "src"
