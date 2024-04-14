@@ -22,6 +22,12 @@ class ControllerTestMaker {
         $controller = str_replace('%%FAKE_DATA%%', $this->getFakeData($jsonSchema), $controller);
         $controller = str_replace('%%ASSERT_COLUMNS%%', $this->getAssertColumns($jsonSchema, $modelName), $controller);
 
+        // create directory if not exists
+        $dir = "tests/Feature/Http/Controllers";
+        if (!file_exists($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
         // publish
         file_put_contents(
             "tests/Feature/Http/Controllers/". Str::ucfirst(Str::camel(Str::singular($modelName))) ."ControllerTest.php",
