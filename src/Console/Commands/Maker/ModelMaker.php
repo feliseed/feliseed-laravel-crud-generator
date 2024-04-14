@@ -13,7 +13,7 @@ class ModelMaker {
         
         // 文字列を置換
         $model = str_replace('%%MODEL_NAME%%', Str::ucfirst(Str::camel(Str::singular($modelName))), $model);
-        $model = str_replace('%%TABLE_NAME%%', Str::snake(Str::plural($jsonSchema->tableName)), $model);
+        $model = str_replace('%%TABLE_NAME%%', $jsonSchema->tableName, $model);
         $model = str_replace('%%FILLABLE%%', $this->getFillable($jsonSchema), $model);
         $model = str_replace('%%TIMESTAMPS%%',  'public $timestamps = ' . ($jsonSchema->hasTimeStamps ? 'true;' : 'false;'), $model);
         $model = str_replace('%%USE_SOFTDELETE%%', $jsonSchema->hasSoftDeletes ? 'use Illuminate\Database\Eloquent\SoftDeletes;' : '', $model);

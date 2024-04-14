@@ -14,12 +14,12 @@ class MigrationMaker {
         $migration = file_get_contents(__DIR__ . '/../../../../stubs/migration.stub');
         
         // 文字列を置換
-        $migration = str_replace('%%TABLE_NAME%%', Str::snake(Str::plural($modelName)), $migration);
+        $migration = str_replace('%%TABLE_NAME%%', $jsonSchema->tableName, $migration);
         $migration = str_replace('%%COLUMNS%%', $this->getColumns($jsonSchema), $migration);
         
         // publish
         file_put_contents(
-            "database/migrations/". date('Y_m_d_His_') . "create_" .  Str::snake(Str::plural($modelName)) ."_table.php",
+            "database/migrations/". date('Y_m_d_His_') . "create_" .  $jsonSchema->tableName ."_table.php",
             $migration
         );
     }

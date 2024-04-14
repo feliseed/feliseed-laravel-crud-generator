@@ -15,8 +15,8 @@ class DatabaseSchema
     public function __construct(string $jsonString)
     {
         $data = json_decode($jsonString);
-        //singularのupper camelで入力
-        $this->tableName = Str::singular(Str::camel($data->name));
+        
+        $this->tableName = $data->name;
         $this->hasTimeStamps = filter_var($data->timestamp, FILTER_VALIDATE_BOOLEAN);
         $this->hasSoftDeletes = filter_var($data->softDeletes, FILTER_VALIDATE_BOOLEAN);
         $this->columns = array_map(function ($column) {

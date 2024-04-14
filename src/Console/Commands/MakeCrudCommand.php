@@ -70,13 +70,14 @@ class MakeCrudCommand extends Command
         // - JSON定義を文字列として取得
         $jsonStr = '';
         if($this->option('table')) {
+            // FIXME: わざわざファイルを生成する必要はない。メモリで十分。
             $path = __DIR__ . "/../../../storage/myfiles/" . date('Ymd_His') . "_" . Str::snake(Str::plural($this->argument('modelName')), '_') . ".json";
             $json = $this->generateTableSchemaJson($this->option('table'), $this->argument('modelName'), $path);
             $jsonStr = file_get_contents($json);
         } else if($this->option('schema')) {
-            $jsonStr = str_replace("%%TABLE_NAME%%", $this->argument('modelName'), file_get_contents($this->option('schema')));
+            $jsonStr = file_get_contents($this->option('schema'));
         } else {
-            $jsonStr = str_replace("%%TABLE_NAME%%", $this->argument('modelName'), file_get_contents($this->databaseSchemaJson));
+            $jsonStr = str_replace("%%TABLE_NAME%%", Str::snake(Str::plural($this->argument('modelName'))), file_get_contents($this->databaseSchemaJson));
         }
         // - schema作成
         $schema = new DatabaseSchema($jsonStr);
