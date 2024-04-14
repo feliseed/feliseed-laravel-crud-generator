@@ -15,3 +15,50 @@ php artisan make:crud MasterProduct --table=master_products
 # Reflect in the DB
 php artisan migrate:refresh --seed
 ```
+
+## JSON Schema file Example
+
+```json
+{
+    "name": "master_products",
+    "timestamp": "true",
+    "softDeletes": "true",
+    "columns": [
+        {
+            "name": "id",
+            "type": "id",
+            "nullable": "false"
+        },
+        {
+            "name": "name",
+            "type": "string:5",
+            "nullable": "false"
+        },
+        {
+            "name": "description",
+            "type": "text",
+            "nullable": "true"
+        },
+        {
+            "name": "announceDate",
+            "type": "date",
+            "nullable": "false"
+        },
+        {
+            "name": "announceTime",
+            "type": "time",
+            "nullable": "false"
+        },
+        {
+            "name": "quantity",
+            "type": "integer",
+            "nullable": "true"
+        },
+        {
+            "name": "isReleased",
+            "type": "boolean",
+            "nullable": "false"
+        }
+    ]
+}
+```

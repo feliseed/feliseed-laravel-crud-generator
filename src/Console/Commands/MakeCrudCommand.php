@@ -38,7 +38,7 @@ class MakeCrudCommand extends Command
      *
      * @var string
      */
-    protected $databaseSchemaJson = __DIR__ . '/../../../storage/myfiles/default_schema.json';
+    protected $databaseSchemaJson = __DIR__ . '/../../../default_schema.json';
 
     /**
      * Execute the console command.
