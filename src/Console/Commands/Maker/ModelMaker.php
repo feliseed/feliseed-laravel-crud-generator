@@ -7,7 +7,7 @@ use Feliseed\LaravelCrudGenerator\Console\Commands\DatabaseSchema;
 
 class ModelMaker {
 
-    public function getModelBy(DatabaseSchema $jsonSchema, String $modelName): void {
+    public function generate(DatabaseSchema $jsonSchema, String $modelName): void {
         
         $model = file_get_contents(__DIR__ . '/../../../../stubs/model.stub');
         

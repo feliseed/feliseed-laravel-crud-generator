@@ -107,18 +107,18 @@ class MakeCrudCommand extends Command
 
     protected function makeCrud(DatabaseSchema $schema, string $modelName) : void {
         FileMaker::mkdirIfNotExists($modelName); // FIXME: ここでやるべきじゃない。個別のMakerでやるべき
-        (new CreateBladeMaker)->getCreateBladeBy($schema, $modelName);
-        (new EditBladeMaker)->getEditBladeBy($schema, $modelName);
-        (new IndexBladeMaker)->getIndexBladeBy($schema, $modelName);
+        (new CreateBladeMaker)->generate($schema, $modelName);
+        (new EditBladeMaker)->generate($schema, $modelName);
+        (new IndexBladeMaker)->generate($schema, $modelName);
         // ShowBladeMaker::getShowBladeBy($schema, $modelName);
-        (new ControllerMaker)->getControllerBy($schema, $modelName);
-        (new ControllerTestMaker)->getControllerTestBy($schema, $modelName);
-        (new StoreRequestMaker)->getStoreRequestBy($schema, $modelName);
-        (new UpdateRequestMaker)->getUpdateRequestBy($schema, $modelName);
-        (new ModelMaker)->getModelBy($schema, $modelName);
-        (new MigrationMaker)->getMigrationBy($schema, $modelName);
-        (new FactoryMaker)->getFactoryBy($schema, $modelName);
-        (new SeederMaker)->getSeederBy($modelName);
+        (new ControllerMaker)->generate($schema, $modelName);
+        (new ControllerTestMaker)->generate($schema, $modelName);
+        (new StoreRequestMaker)->generate($schema, $modelName);
+        (new UpdateRequestMaker)->generate($schema, $modelName);
+        (new ModelMaker)->generate($schema, $modelName);
+        (new MigrationMaker)->generate($schema, $modelName);
+        (new FactoryMaker)->generate($schema, $modelName);
+        (new SeederMaker)->generate($modelName);
         self::updateDatabaseSeeder($modelName);
         self::updateWebphp($modelName);
     }

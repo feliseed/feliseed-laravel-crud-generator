@@ -9,7 +9,7 @@ use InvalidArgumentException;
 
 class ControllerTestMaker {
 
-    public function getControllerTestBy(DatabaseSchema $jsonSchema, String $modelName): void {
+    public function generate(DatabaseSchema $jsonSchema, String $modelName): void {
         
         $controller = file_get_contents(__DIR__ . '/../../../../stubs/test.stub');
         

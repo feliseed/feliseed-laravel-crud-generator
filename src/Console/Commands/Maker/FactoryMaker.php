@@ -9,7 +9,7 @@ use InvalidArgumentException;
 
 class FactoryMaker {
 
-    public function getFactoryBy(DatabaseSchema $jsonSchema, String $modelName): void {
+    public function generate(DatabaseSchema $jsonSchema, String $modelName): void {
         
         $factory = file_get_contents(__DIR__ . '/../../../../stubs/factory.stub');
         

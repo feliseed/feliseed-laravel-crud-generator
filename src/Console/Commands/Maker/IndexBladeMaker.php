@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 use Feliseed\LaravelCrudGenerator\Console\Commands\DatabaseSchema;
 
 class IndexBladeMaker {
-    public function getIndexBladeBy(DatabaseSchema $jsonSchema, String $modelName): void {
+    public function generate(DatabaseSchema $jsonSchema, String $modelName): void {
         
         $indexBlade = file_get_contents(__DIR__ . '/../../../../stubs/index.blade.stub');
         

@@ -8,7 +8,7 @@ use Feliseed\LaravelCrudGenerator\Console\Commands\Column;
 use Illuminate\Support\Facades\Log;
 
 class EditBladeMaker {
-    public function getEditBladeBy(DatabaseSchema $jsonSchema, String $modelName): void {
+    public function generate(DatabaseSchema $jsonSchema, String $modelName): void {
         
         $indexBlade = file_get_contents(__DIR__ . '/../../../../stubs/edit.blade.stub');
         

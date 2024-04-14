@@ -6,7 +6,7 @@ use Feliseed\LaravelCrudGenerator\Console\Commands\DatabaseSchema;
 use Feliseed\LaravelCrudGenerator\Console\Commands\Column;
 
 class CreateBladeMaker {
-    public function getCreateBladeBy(DatabaseSchema $jsonSchema, String $modelName): void {
+    public function generate(DatabaseSchema $jsonSchema, String $modelName): void {
         
         $indexBlade = file_get_contents(__DIR__ . '/../../../../stubs/create.blade.stub');
         

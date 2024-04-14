@@ -8,7 +8,7 @@ use Feliseed\LaravelCrudGenerator\Console\Commands\DatabaseSchema;
 
 class SeederMaker {
 
-    public function getSeederBy(String $modelName): void {
+    public function generate(String $modelName): void {
         
         $model = file_get_contents(__DIR__ . '/../../../../stubs/seeder.stub');
         

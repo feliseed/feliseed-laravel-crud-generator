@@ -9,7 +9,7 @@ use InvalidArgumentException;
 
 class MigrationMaker {
 
-    public function getMigrationBy(DatabaseSchema $jsonSchema, String $modelName): void {
+    public function generate(DatabaseSchema $jsonSchema, String $modelName): void {
         
         $migration = file_get_contents(__DIR__ . '/../../../../stubs/migration.stub');
         

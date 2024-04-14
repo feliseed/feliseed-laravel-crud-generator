@@ -7,7 +7,7 @@ use Feliseed\LaravelCrudGenerator\Console\Commands\DatabaseSchema;
 
 class UpdateRequestMaker {
     
-    public function getUpdateRequestBy(DatabaseSchema $jsonSchema, String $modelName): void {
+    public function generate(DatabaseSchema $jsonSchema, String $modelName): void {
         
         $controller = file_get_contents(__DIR__ . '/../../../../stubs/update-request.stub');
         

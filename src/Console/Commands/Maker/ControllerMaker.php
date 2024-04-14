@@ -7,7 +7,7 @@ use Feliseed\LaravelCrudGenerator\Console\Commands\DatabaseSchema;
 
 class ControllerMaker {
 
-    public function getControllerBy(DatabaseSchema $jsonSchema, String $modelName): void {
+    public function generate(DatabaseSchema $jsonSchema, String $modelName): void {
         
         $controller = file_get_contents(__DIR__ . '/../../../../stubs/controller.stub');
         
