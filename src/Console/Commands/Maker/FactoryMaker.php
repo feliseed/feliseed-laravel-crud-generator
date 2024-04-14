@@ -1,23 +1,46 @@
 <?php
 
 namespace Feliseed\LaravelCrudGenerator\Console\Commands\Maker;
+
 use Illuminate\Support\Str;
 use Feliseed\LaravelCrudGenerator\Console\Commands\DatabaseSchema;
 use Feliseed\LaravelCrudGenerator\Console\Commands\Column;
 use InvalidArgumentException;
 
-class FactoryMaker extends FileMaker {
-    public static function getFactoryBy(DatabaseSchema $jsonSchema, String $modelName): void {
-        $singular = Str::singular($modelName);
-        $upperSingular = Str::ucfirst($singular);
-        $factory = __DIR__ . '/../../../../templates/database/factories/SampleFactory.php';
-        $factoryFilePath = self::getFilePathOf($modelName);
-        copy($factory, $factoryFilePath);
-        self::sedSampleToModelNameNotSnakely($factoryFilePath, $upperSingular);
-                self::sedCOLUMNSFor($jsonSchema, $modelName, '%%COLUMNS%%', [self::class, 'getInsertStrFor']);
+class FactoryMaker {
 
+    public function getFactoryBy(DatabaseSchema $jsonSchema, String $modelName): void {
+        
+        $factory = file_get_contents(__DIR__ . '/../../../../stubs/factory.stub');
+        
+        // 文字列を置換
+        $factory = str_replace('%%MODEL_NAME%%', Str::ucfirst(Str::camel(Str::singular($modelName))), $factory);
+        $factory = str_replace('%%DEFINITION%%', $this->getDefinition($jsonSchema), $factory);
+        
+        // publish
+        file_put_contents(
+            "database/factories/". Str::ucfirst(Str::camel(Str::singular($modelName))) ."Factory.php",
+            $factory
+        );
     }
 
+    // public static function getFactoryBy(DatabaseSchema $jsonSchema, String $modelName): void {
+    //     $singular = Str::singular($modelName);
+    //     $upperSingular = Str::ucfirst($singular);
+    //     $factory = __DIR__ . '/../../../../templates/database/factories/SampleFactory.php';
+    //     $factoryFilePath = self::getFilePathOf($modelName);
+    //     copy($factory, $factoryFilePath);
+    //     self::sedSampleToModelNameNotSnakely($factoryFilePath, $upperSingular);
+    //             self::sedCOLUMNSFor($jsonSchema, $modelName, '%%COLUMNS%%', [self::class, 'getInsertStrFor']);
+
+    // }
+    
+    // FIXME: 可読性低い
+    protected function getDefinition(DatabaseSchema $jsonSchema) : String {
+        $array = array_map([self::class, 'getInsertStrOf'], $jsonSchema->columns);
+        return rtrim(implode('', $array), ",\n\t");
+    }
+    // FIXME: 可読性低い
     protected static function getInsertStrOf(Column $column) : String {
         if($column->type == "id") {
             return "";
@@ -46,17 +69,11 @@ class FactoryMaker extends FileMaker {
         }
     }
 
-    //TODO:dry化
-    protected static function getInsertStrFor(DatabaseSchema $jsonSchema) : String {
-        $tmp = array_map([self::class, 'getInsertStrOf'], $jsonSchema->columns);
-        return rtrim(implode('', $tmp), ",\n\t");
-    }
-
-    protected static function getFilePathOf(String $tableName): String{
-        $singular = Str::singular($tableName);
-        $upperSingular = Str::ucfirst($singular);
-        $factoryFilePath = "./database/factories/{$upperSingular}Factory.php";
-        return $factoryFilePath;
-    }
+    // protected static function getFilePathOf(String $tableName): String{
+    //     $singular = Str::singular($tableName);
+    //     $upperSingular = Str::ucfirst($singular);
+    //     $factoryFilePath = "./database/factories/{$upperSingular}Factory.php";
+    //     return $factoryFilePath;
+    // }
 
 }
