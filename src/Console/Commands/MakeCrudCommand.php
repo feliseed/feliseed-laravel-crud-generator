@@ -116,7 +116,7 @@ class MakeCrudCommand extends Command
         (new MigrationMaker)->generate($schema, $modelName);
         (new FactoryMaker)->generate($schema, $modelName);
         (new SeederMaker)->generate($modelName);
-        $this->updateDatabaseSeeder($modelName);
+        $this->addSeederDefinition('./database/seeders/Databaseseeder.php', $modelName);
         $this->addRoute('./routes/web.php', $modelName);
     }
 
@@ -128,20 +128,16 @@ class MakeCrudCommand extends Command
         file_put_contents($file, $current);
     }
 
-    private function updateDatabaseSeeder($modelName): void {
-        $singular = Str::singular($modelName);
-        $upperSingular = Str::ucfirst($singular);
-        //public function run() {を置換する
-        //(改行の仕方が違うかもしれないので、よく見る3パターンを置換する)
-        $arrayReplace = array(
+    private function addSeederDefinition(string $file, string $modelName): void {
+        $upperSingular = Str::ucfirst(Str::singular($modelName));
+
+        $databaseSeeder = './database/seeders/Databaseseeder.php';
+        $data = strtr(file_get_contents($databaseSeeder), [
             "public function run()\n    {" => "public function run()\n    {\n\t\t\$this->call({$upperSingular}Seeder::class);",
             "public function run(): void\n    {" => "public function run()\n    {\n\t\t\$this->call({$upperSingular}Seeder::class);",
             "public function run() {" => "public function run()\n    {\n\t\t\$this->call({$upperSingular}Seeder::class);",
             "public function run(){" => "public function run()\n    {\n\t\t\$this->call({$upperSingular}Seeder::class);",
-        );
-        $fileName = './database/seeders/Databaseseeder.php';
-        $buff = file_get_contents($fileName);
-        $buff = strtr($buff, $arrayReplace);
-        file_put_contents($fileName, $buff);
+        ]);
+        file_put_contents($databaseSeeder, $data);
     }
 }
