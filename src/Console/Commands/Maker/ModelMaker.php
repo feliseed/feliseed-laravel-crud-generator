@@ -1,9 +1,9 @@
 <?php
 
 namespace Feliseed\LaravelCrudGenerator\Console\Commands\Maker;
+
 use Illuminate\Support\Str;
 use Feliseed\LaravelCrudGenerator\Console\Commands\DatabaseSchema;
-use Feliseed\LaravelCrudGenerator\Console\Commands\Column;
 
 class ModelMaker {
 
