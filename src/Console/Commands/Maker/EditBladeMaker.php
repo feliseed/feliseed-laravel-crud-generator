@@ -33,15 +33,19 @@ class EditBladeMaker {
                 case 'id':
                     break;
                 case 'boolean':
+                    $result .= $this->getLabel($column->name, !$column->nullable);
                     $result .= $this->getCheckbox(Str::camel(Str::singular($modelName)), $column->name, false);
                     break;
                 case 'text':
+                    $result .= $this->getLabel($column->name, !$column->nullable);
                     $result .= $this->getTextarea(Str::camel(Str::singular($modelName)), $column->name, !$column->nullable, false);
                     break;
                 case 'time':
+                    $result .= $this->getLabel($column->name, !$column->nullable);
                     $result .= $this->getTimeInput(Str::camel(Str::singular($modelName)), $column->name, !$column->nullable, false);
                     break;
                 default:
+                    $result .= $this->getLabel($column->name, !$column->nullable);
                     $result .= $this->getTextInput(Str::camel(Str::singular($modelName)), $column->name, !$column->nullable, false);
                     break;
             }
