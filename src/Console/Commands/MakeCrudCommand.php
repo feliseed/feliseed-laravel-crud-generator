@@ -117,17 +117,14 @@ class MakeCrudCommand extends Command
         (new FactoryMaker)->generate($schema, $modelName);
         (new SeederMaker)->generate($modelName);
         $this->updateDatabaseSeeder($modelName);
-        $this->updateWebphp($modelName);
+        $this->addRoute('./routes/web.php', $modelName);
     }
 
-    private function updateWebphp(string $modelName) : void {
-        $singular = Str::singular($modelName);
-        $upperSingular = Str::ucfirst($singular);
-        $plural = Str::plural($singular);
-        $chainPlural = Str::snake($plural, '-');
-        $file = './routes/web.php';
+    private function addRoute(string $file, string $modelName) : void {
+        $camel = Str::ucfirst(Str::camel(Str::singular($modelName)));
+        $kebab = Str::kebab(Str::plural($modelName));
         $current = file_get_contents($file);
-        $current .= "\nRoute::resource('{$chainPlural}'". ",'App\Http\Controllers\\{$upperSingular}Controller');";
+        $current .= "\nRoute::resource('{$kebab}'". ",'App\Http\Controllers\\{$camel}Controller');";
         file_put_contents($file, $current);
     }
 
