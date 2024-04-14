@@ -5,62 +5,32 @@ use Illuminate\Support\Str;
 use Feliseed\LaravelCrudGenerator\Console\Commands\DatabaseSchema;
 use Feliseed\LaravelCrudGenerator\Console\Commands\Column;
 
-class ModelMaker extends FileMaker {
-    public static function getModelBy(DatabaseSchema $jsonSchema, String  $modelName): void {
-        $model = __DIR__ . '/../../../../templates/app/Models/Sample.php';
-        $filePath = self::getFilePathOf($modelName);
-        copy($model, $filePath);
-        $singular = Str::singular($modelName);
-        $upperSingular = Str::ucfirst($singular);
-        self::sedSampleToModelNameNotSnakely($filePath, $upperSingular);
-        self::sedCOLUMNSFor($jsonSchema, $modelName, '%%COLUMNS%%', [self::class, 'getInsertStrFor']);
-        self::sedCOLUMNSFor($jsonSchema, $modelName, '%%TIMESTAMPS%%', [self::class, 'getStrForTimeStampsBy']);
-        self::sedCOLUMNSFor($jsonSchema, $modelName, '%%USE_SOFTDELETES1%%', [self::class, 'getStrForUseSoftDeletesBy']);
-        self::sedCOLUMNSFor($jsonSchema, $modelName, '%%USE_SOFTDELETES2%%', [self::class, 'getStrForSoftDeletesBy']);
-        self::sedCOLUMNSFor($jsonSchema, $modelName, '%%TABLE_NAME%%', [self::class, 'getStrForTableNameBy']);
+class ModelMaker {
+
+    public function getModelBy(DatabaseSchema $jsonSchema, String $modelName): void {
+        
+        $model = file_get_contents(__DIR__ . '/../../../../stubs/model.stub');
+        
+        // 文字列を置換
+        $model = str_replace('%%MODEL_NAME%%', Str::ucfirst(Str::camel(Str::singular($modelName))), $model);
+        $model = str_replace('%%TABLE_NAME%%', Str::snake(Str::plural($jsonSchema->tableName)), $model);
+        $model = str_replace('%%FILLABLE%%', $this->getFillable($jsonSchema), $model);
+        $model = str_replace('%%TIMESTAMPS%%',  'public $timestamps = ' . ($jsonSchema->hasTimeStamps ? 'true;' : 'false;'), $model);
+        $model = str_replace('%%USE_SOFTDELETE%%', $jsonSchema->hasSoftDeletes ? 'use Illuminate\Database\Eloquent\SoftDeletes;' : '', $model);
+        $model = str_replace('%%TRAIT_SOFTDELETE%%', $jsonSchema->hasSoftDeletes ? 'use SoftDeletes;' : '', $model);
+        
+        // publish
+        file_put_contents(
+            "app/Models/". Str::ucfirst(Str::camel(Str::singular($modelName))) .".php",
+            $model
+        );
     }
 
-    protected static function getInsertStrOf(Column $column) : String {
-        return '\'' . $column->name . '\'' . ",\n\t\t";
+    protected function getFillable(DatabaseSchema $jsonSchema): String {
+        $tmp = array_map(function($column) {
+            return "'{$column->name}'";
+        }, $jsonSchema->columns);
+        return implode(",\n\t\t", $tmp);
     }
 
-    protected static function getInsertStrFor(DatabaseSchema $jsonSchema) : String {
-        $tmp = array_map([self::class, 'getInsertStrOf'], $jsonSchema->columns);
-        $result = str_replace(" ", "", rtrim(implode(' ', $tmp), ",\n\t\t"));
-        return $result;
-    }
-
-    protected static function getFilePathOf(String $modelName): String {
-        $singular = Str::singular($modelName);
-        $upperSingular = Str::ucfirst($singular);
-        return "./app/Models/{$upperSingular}.php";
-    }
-
-    protected static function getStrForTimeStampsBy(DatabaseSchema $jsonSchema): String {
-        if($jsonSchema->hasTimeStamps) {
-            return '';
-        } else {
-            return 'public $timestamps = false;';
-        }
-    }
-
-    protected static function getStrForSoftDeletesBy(DatabaseSchema $jsonSchema): String {
-        if($jsonSchema->hasSoftDeletes) {
-            return 'use SoftDeletes;';
-        } else {
-            return '';
-        }
-    }
-
-    protected static function getStrForTableNameBy(DatabaseSchema $jsonSchema): String {
-        return '\'' . Str::snake(Str::plural($jsonSchema->tableName)) . '\';';
-    }
-
-    protected static function getStrForUseSoftDeletesBy(DatabaseSchema $jsonSchema): String {
-        if($jsonSchema->hasSoftDeletes) {
-            return 'use Illuminate\Database\Eloquent\SoftDeletes;';
-        } else {
-            return '';
-        }
-    }
 }
