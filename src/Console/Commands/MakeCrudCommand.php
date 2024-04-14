@@ -7,7 +7,6 @@ use Illuminate\Support\Str;
 use Feliseed\LaravelCrudGenerator\Console\Commands\Maker\CreateBladeMaker;
 use Feliseed\LaravelCrudGenerator\Console\Commands\Maker\EditBladeMaker;
 use Feliseed\LaravelCrudGenerator\Console\Commands\Maker\IndexBladeMaker;
-use Feliseed\LaravelCrudGenerator\Console\Commands\Maker\ShowBladeMaker;
 use Feliseed\LaravelCrudGenerator\Console\Commands\Maker\ControllerMaker;
 use Feliseed\LaravelCrudGenerator\Console\Commands\Maker\ControllerTestMaker;
 use Feliseed\LaravelCrudGenerator\Console\Commands\Maker\StoreRequestMaker;
@@ -16,7 +15,6 @@ use Feliseed\LaravelCrudGenerator\Console\Commands\Maker\SeederMaker;
 use Feliseed\LaravelCrudGenerator\Console\Commands\Maker\ModelMaker;
 use Feliseed\LaravelCrudGenerator\Console\Commands\Maker\MigrationMaker;
 use Feliseed\LaravelCrudGenerator\Console\Commands\Maker\FactoryMaker;
-use Feliseed\LaravelCrudGenerator\Console\Commands\Maker\FileMaker;
 use Feliseed\LaravelCrudGenerator\Console\Commands\Maker\JsonMaker;
 
 class MakeCrudCommand extends Command
@@ -106,11 +104,9 @@ class MakeCrudCommand extends Command
     }
 
     protected function makeCrud(DatabaseSchema $schema, string $modelName) : void {
-        FileMaker::mkdirIfNotExists($modelName); // FIXME: ここでやるべきじゃない。個別のMakerでやるべき
         (new CreateBladeMaker)->generate($schema, $modelName);
         (new EditBladeMaker)->generate($schema, $modelName);
         (new IndexBladeMaker)->generate($schema, $modelName);
-        // ShowBladeMaker::getShowBladeBy($schema, $modelName);
         (new ControllerMaker)->generate($schema, $modelName);
         (new ControllerTestMaker)->generate($schema, $modelName);
         (new StoreRequestMaker)->generate($schema, $modelName);
