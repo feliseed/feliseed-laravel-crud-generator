@@ -99,7 +99,7 @@ class MakeCrudCommand extends Command
         $schemaManager = DBConnect::getSchmaManager();
         $columns = $schemaManager->listTableColumns($table);
         $jsonData = JsonMaker::getJsonFor($modelName, false, false, $columns);
-        $this->storage($jsonData, $jsonFilePath);
+        file_put_contents($jsonFilePath, $jsonData);
         return $jsonFilePath;
     }
 
@@ -117,10 +117,6 @@ class MakeCrudCommand extends Command
         (new SeederMaker)->generate($modelName);
         $this->updateDatabaseSeeder($modelName);
         $this->updateWebphp($modelName);
-    }
-
-    private function storage(string $json, string $filePath) : void {
-        file_put_contents($filePath, $json);
     }
 
     private function updateWebphp(string $modelName) : void {
