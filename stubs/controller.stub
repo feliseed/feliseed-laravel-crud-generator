@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\%%MODEL_NAME%%StoreRequest;
+use App\Http\Requests\%%MODEL_NAME%%UpdateRequest;
+use App\Models\%%MODEL_NAME%%;
+use Illuminate\Http\Request;
+
+class %%MODEL_NAME%%Controller extends Controller
+{
+    public function index(Request $request)
+    {
+        $%%VARIABLE_PLURAL%% = %%MODEL_NAME%%::query()
+            ->when($request->input('%%SEARCH_ITEM%%'), function ($query, $value) {
+                $query->where('%%SEARCH_ITEM%%', 'LIKE', "%{$value}%");
+            })
+            ->get();
+
+        return view('%%VIEW_NAME%%.index', compact('%%VARIABLE_PLURAL%%'));
+    }
+
+    public function create(Request $request)
+    {
+        return view('%%VIEW_NAME%%.create');
+    }
+
+    public function store(%%MODEL_NAME%%StoreRequest $request)
+    {
+        %%MODEL_NAME%%::create($request->validated());
+
+        return redirect()->route('%%ROUTE_NAME%%.index');
+    }
+
+    public function show(Request $request, %%MODEL_NAME%% $%%VARIABLE_SINGULAR%%)
+    {
+        return view('%%VIEW_NAME%%.show', compact('%%VARIABLE_SINGULAR%%'));
+    }
+
+    public function edit(Request $request, %%MODEL_NAME%% $%%VARIABLE_SINGULAR%%)
+    {
+        return view('%%VIEW_NAME%%.edit', compact('%%VARIABLE_SINGULAR%%'));
+    }
+
+    public function update(%%MODEL_NAME%%UpdateRequest $request, %%MODEL_NAME%% $%%VARIABLE_SINGULAR%%)
+    {
+        $%%VARIABLE_SINGULAR%%->update($request->validated());
+
+        return redirect()->route('%%ROUTE_NAME%%.index');
+    }
+
+    public function destroy(Request $request, %%MODEL_NAME%% $%%VARIABLE_SINGULAR%%)
+    {
+        $%%VARIABLE_SINGULAR%%->delete();
+
+        return redirect()->route('%%ROUTE_NAME%%.index');
+    }
+}
