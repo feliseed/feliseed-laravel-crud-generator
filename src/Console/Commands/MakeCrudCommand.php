@@ -115,15 +115,15 @@ class MakeCrudCommand extends Command
         (new MigrationMaker)->generate($schema, $modelName);
         (new FactoryMaker)->generate($schema, $modelName);
         (new SeederMaker)->generate($modelName);
-        self::updateDatabaseSeeder($modelName);
-        self::updateWebphp($modelName);
+        $this->updateDatabaseSeeder($modelName);
+        $this->updateWebphp($modelName);
     }
 
     private function storage(string $json, string $filePath) : void {
         file_put_contents($filePath, $json);
     }
 
-    private static function updateWebphp(string $modelName) : void {
+    private function updateWebphp(string $modelName) : void {
         $singular = Str::singular($modelName);
         $upperSingular = Str::ucfirst($singular);
         $plural = Str::plural($singular);
@@ -134,7 +134,7 @@ class MakeCrudCommand extends Command
         file_put_contents($file, $current);
     }
 
-    private static function updateDatabaseSeeder($modelName): void {
+    private function updateDatabaseSeeder($modelName): void {
         $singular = Str::singular($modelName);
         $upperSingular = Str::ucfirst($singular);
         //public function run() {を置換する
