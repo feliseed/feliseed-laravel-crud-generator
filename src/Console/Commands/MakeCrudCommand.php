@@ -114,7 +114,7 @@ class MakeCrudCommand extends Command
         (new ControllerMaker)->getControllerBy($schema, $modelName);
         ControllerTestMaker::getControllerTestBy($schema, $modelName);
         (new StoreRequestMaker)->getStoreRequestBy($schema, $modelName);
-        UpdateRequestMaker::getUpdateRequestBy($schema, $modelName);
+        (new UpdateRequestMaker)->getUpdateRequestBy($schema, $modelName);
         ModelMaker::getModelBy($schema, $modelName);
         MigrationMaker::getMigrationBy($schema, $modelName);
         FactoryMaker::getFactoryBy($schema, $modelName);

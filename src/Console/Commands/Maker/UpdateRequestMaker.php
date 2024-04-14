@@ -1,23 +1,52 @@
 <?php
 
 namespace Feliseed\LaravelCrudGenerator\Console\Commands\Maker;
+
 use Illuminate\Support\Str;
 use Feliseed\LaravelCrudGenerator\Console\Commands\DatabaseSchema;
 
-class UpdateRequestMaker extends RequestMaker {
-    public static function getUpdateRequestBy(DatabaseSchema $jsonSchema, String $modelName): void {
-        $request = __DIR__ . '/../../../../templates/app/Http/Requests/SampleUpdateRequest.php';
-        $newRequest = self::getFilePathOf($modelName);
-        copy($request, $newRequest);
-        $singular = Str::singular($modelName);
-        $upperSingular = Str::ucfirst($singular);
-        self::sedSampleToModelNameNotSnakely($newRequest, $upperSingular);
-        self::sedCOLUMNSFor($jsonSchema, $modelName, '%%FIELDS_VALIDATION%%', [self::class, 'getInsertStrFor']);
+class UpdateRequestMaker {
+    
+    public function getUpdateRequestBy(DatabaseSchema $jsonSchema, String $modelName): void {
+        
+        $controller = file_get_contents(__DIR__ . '/../../../../stubs/update-request.stub');
+        
+        // 文字列を置換
+        $controller = str_replace('%%MODEL_NAME%%', Str::ucfirst(Str::camel(Str::singular($modelName))), $controller);
+        $controller = str_replace('%%RULES%%', $this->getRules($jsonSchema), $controller);
+        
+        // publish
+        file_put_contents(
+            "app/Http/Requests/". Str::ucfirst(Str::camel(Str::singular($modelName))) ."UpdateRequest.php",
+            $controller
+        );
     }
 
-    protected static function getFilePathOf(String $modeName): String {
-        $singular = Str::singular($modeName);
-        $upperSingular = Str::ucfirst($singular);
-        return "./app/Http/Requests/{$upperSingular}UpdateRequest.php";
+    protected function getRules(DatabaseSchema $jsonSchema): String {
+        $result = '';
+
+        foreach($jsonSchema->columns as $column) {
+
+            if($column->name === 'id') continue;
+
+            $required = $column->nullable ? "nullable" : "required";
+            $format = match(explode(":", $column->type)[0]) {
+                'string' => (function() use ($column){
+                    $length = explode(":", $column->type)[1];
+                    $max = $length ? "|max:{$length}" : '';
+                    return "string{$max}";
+                })(),
+                'integer' => "integer",
+                'boolean' => "boolean",
+                'text' => "string",
+                'date' => "date",
+                'time' => "date_format:H:i",
+                'datetime' => "date",
+            };
+
+            $result .= "'{$column->name}' => '{$required}|{$format}',\n\t\t\t";
+        }
+
+        return $result;
     }
 }
