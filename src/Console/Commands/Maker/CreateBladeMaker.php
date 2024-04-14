@@ -35,23 +35,26 @@ class CreateBladeMaker {
                 case 'boolean':
                     $result .= $this->getLabel($column->name, !$column->nullable);
                     $result .= $this->getCheckbox(Str::camel(Str::singular($modelName)), $column->name);
+                    $result .= $this->getValidationErrorMessage($column->name);
                     break;
                 case 'text':
                     $result .= $this->getLabel($column->name, !$column->nullable);
                     $result .= $this->getTextarea(Str::camel(Str::singular($modelName)), $column->name, !$column->nullable);
+                    $result .= $this->getValidationErrorMessage($column->name);
                     break;
                 case 'time':
                     $result .= $this->getLabel($column->name, !$column->nullable);
                     $result .= $this->getTimeInput(Str::camel(Str::singular($modelName)), $column->name, !$column->nullable);
+                    $result .= $this->getValidationErrorMessage($column->name);
                     break;
                 default:
                     $result .= $this->getLabel($column->name, !$column->nullable);
                     $result .= $this->getTextInput(Str::camel(Str::singular($modelName)), $column->name, !$column->nullable);
+                    $result .= $this->getValidationErrorMessage($column->name);
                     break;
             }
-        }
 
-        $result .= $this->getValidationErrorMessage($column->name);
+        }
 
         return $result;
     }
