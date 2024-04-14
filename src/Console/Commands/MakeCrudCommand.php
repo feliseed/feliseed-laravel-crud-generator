@@ -107,7 +107,7 @@ class MakeCrudCommand extends Command
 
     protected function makeCrud(DatabaseSchema $schema, string $modelName) : void {
         FileMaker::mkdirIfNotExists($modelName);
-        CreateBladeMaker::getCreateBladeBy($schema, $modelName);
+        (new CreateBladeMaker)->getCreateBladeBy($schema, $modelName);
         (new EditBladeMaker)->getEditBladeBy($schema, $modelName);
         (new IndexBladeMaker)->getIndexBladeBy($schema, $modelName);
         ShowBladeMaker::getShowBladeBy($schema, $modelName);
