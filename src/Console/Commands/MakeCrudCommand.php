@@ -110,7 +110,7 @@ class MakeCrudCommand extends Command
         (new CreateBladeMaker)->getCreateBladeBy($schema, $modelName);
         (new EditBladeMaker)->getEditBladeBy($schema, $modelName);
         (new IndexBladeMaker)->getIndexBladeBy($schema, $modelName);
-        ShowBladeMaker::getShowBladeBy($schema, $modelName);
+        // ShowBladeMaker::getShowBladeBy($schema, $modelName);
         ControllerMaker::getControllerBy($schema, $modelName);
         ControllerTestMaker::getControllerTestBy($schema, $modelName);
         StoreRequestMaker::getStoreRequestBy($schema, $modelName);
