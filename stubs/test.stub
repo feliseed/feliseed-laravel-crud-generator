@@ -1,0 +1,158 @@
+<?php
+
+namespace Tests\Feature\Http\Controllers;
+
+use App\Models\%%MODEL_NAME%%;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
+use App\Models\User;
+
+/**
+ * @see \App\Http\Controllers\%%MODEL_NAME%%Controller
+ */
+class %%MODEL_NAME%%ControllerTest extends TestCase
+{
+    use RefreshDatabase, WithFaker;
+
+    private $admin;
+    private $editor;
+    private $viewer;
+
+    // セットアップ
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // ユーザにリレーションを追加している場合は適宜シーダーを追記してください。
+        // $this->seed('MasterDepartmentSeeder');
+
+        $this->admin = User::factory()->create();
+    }
+
+    /**
+     * @test
+     */
+    public function 一覧_表示できる()
+    {
+        $%%VARIABLE_PLURAL%% = %%MODEL_NAME%%::factory()->count(3)->create();
+
+        $response = $this->actingAs($this->admin)->get(route('%%ROUTE_NAME%%.index'));
+
+        $response->assertOk();
+        $response->assertViewIs('%%VIEW_NAME%%.index');
+        $response->assertViewHas('%%VARIABLE_PLURAL%%');
+    }
+
+
+    /**
+     * @test
+     */
+    public function 新規登録_表示できる()
+    {
+        $this->be($this->admin);
+
+        $response = $this->get(route('%%ROUTE_NAME%%.create'));
+
+        $response->assertOk();
+        $response->assertViewIs('%%VIEW_NAME%%.create');
+    }
+
+    /**
+     * @test
+     */
+    public function 新規登録_保存できる()
+    {
+        $this->be($this->admin);
+
+        $data = [
+            %%FAKE_DATA%%
+        ];
+
+        $response = $this->post(route('%%ROUTE_NAME%%.store'), $data);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect(route('%%ROUTE_NAME%%.index'));
+
+        $this->assertDatabaseHas(%%MODEL_NAME%%::class, $data);
+    }
+
+
+    /**
+     * @test
+     */
+    public function 詳細_表示できる()
+    {
+        $%%VARIABLE_SINGULAR%% = %%MODEL_NAME%%::factory()->create();
+
+        $this->be($this->admin);
+
+        $response = $this->get(route('%%ROUTE_NAME%%.show', $%%VARIABLE_SINGULAR%%));
+
+        $response->assertOk();
+        $response->assertViewIs('%%VIEW_NAME%%.show');
+        $response->assertViewHas('%%VARIABLE_SINGULAR%%');
+    }
+
+    /**
+     * @test
+     */
+    public function 編集_表示できる()
+    {
+        $%%VARIABLE_SINGULAR%% = %%MODEL_NAME%%::factory()->create();
+
+        $this->be($this->admin);
+
+        $response = $this->get(route('%%ROUTE_NAME%%.edit', $%%VARIABLE_SINGULAR%%));
+
+        $response->assertOk();
+        $response->assertViewIs('%%VIEW_NAME%%.edit');
+        $response->assertViewHas('%%VARIABLE_SINGULAR%%');
+    }
+
+    /**
+     * @test
+     */
+    public function 編集_保存できる()
+    {
+        $%%VARIABLE_SINGULAR%% = %%MODEL_NAME%%::factory()->create();
+
+        $this->be($this->admin);
+
+        $data = [
+            %%FAKE_DATA%%
+        ];
+
+        $response = $this->put(route('%%ROUTE_NAME%%.update', $%%VARIABLE_SINGULAR%%), $data);
+
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect(route('%%ROUTE_NAME%%.index'));
+
+        $%%VARIABLE_SINGULAR%%->refresh();
+        $this->assertDatabaseHas(%%MODEL_NAME%%::class, [
+            %%ASSERT_COLUMNS%%
+        ]);
+    }
+
+
+    /**
+     * @test
+     */
+    public function 削除_削除できる()
+    {
+        $%%VARIABLE_SINGULAR%% = %%MODEL_NAME%%::factory()->create();
+
+        $this->be($this->admin);
+
+        $response = $this->delete(route('%%ROUTE_NAME%%.destroy', $%%VARIABLE_SINGULAR%%));
+
+        $response->assertSessionHasNoErrors();
+
+        $response->assertRedirect(route('%%ROUTE_NAME%%.index'));
+        if (in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($%%VARIABLE_SINGULAR%%))) {
+            $this->assertNotNull($%%VARIABLE_SINGULAR%%->fresh()->deleted_at);
+        } else {
+            $this->assertModelMissing($%%VARIABLE_SINGULAR%%);
+        }
+    }
+}

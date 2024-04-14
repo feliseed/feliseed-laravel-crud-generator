@@ -106,13 +106,13 @@ class MakeCrudCommand extends Command
     }
 
     protected function makeCrud(DatabaseSchema $schema, string $modelName) : void {
-        FileMaker::mkdirIfNotExists($modelName);
+        FileMaker::mkdirIfNotExists($modelName); // FIXME: ここでやるべきじゃない。個別のMakerでやるべき
         (new CreateBladeMaker)->getCreateBladeBy($schema, $modelName);
         (new EditBladeMaker)->getEditBladeBy($schema, $modelName);
         (new IndexBladeMaker)->getIndexBladeBy($schema, $modelName);
         // ShowBladeMaker::getShowBladeBy($schema, $modelName);
         (new ControllerMaker)->getControllerBy($schema, $modelName);
-        ControllerTestMaker::getControllerTestBy($schema, $modelName);
+        (new ControllerTestMaker)->getControllerTestBy($schema, $modelName);
         (new StoreRequestMaker)->getStoreRequestBy($schema, $modelName);
         (new UpdateRequestMaker)->getUpdateRequestBy($schema, $modelName);
         ModelMaker::getModelBy($schema, $modelName);

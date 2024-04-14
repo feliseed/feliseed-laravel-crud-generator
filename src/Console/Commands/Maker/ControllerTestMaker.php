@@ -1,25 +1,41 @@
 <?php
 
 namespace Feliseed\LaravelCrudGenerator\Console\Commands\Maker;
+
 use Illuminate\Support\Str;
 use Feliseed\LaravelCrudGenerator\Console\Commands\DatabaseSchema;
 use Feliseed\LaravelCrudGenerator\Console\Commands\Column;
 use InvalidArgumentException;
 
-class ControllerTestMaker extends FileMaker {
-    public static function getControllerTestBy(DatabaseSchema $jsonSchema, String $modelName): void {
-        $singular = Str::singular($modelName);
-        $upperSingular = Str::ucfirst($singular);
-        $templateFilePath = __DIR__ . '/../../../../templates/tests/Feature/Http/Controllers/SampleControllerTest.php';
-        $filePath = self::getFilePathOf($modelName);
-        copy($templateFilePath, $filePath);
-        self::sedSampleToModelNameNotSnakely($filePath, $upperSingular);
-        self::sedCOLUMNSForView($jsonSchema, Str::lcfirst($singular), '%%ASSERT_COLUMNS%%', [self::class, 'getInssertAssertStrFor']);
-        self::sedCOLUMNSFor($jsonSchema, $modelName, '%%COLUMNS%%', [self::class, 'getInsertStrFor']);
+class ControllerTestMaker {
 
+    public function getControllerTestBy(DatabaseSchema $jsonSchema, String $modelName): void {
+        
+        $controller = file_get_contents(__DIR__ . '/../../../../stubs/test.stub');
+        
+        // 文字列を置換
+        $controller = str_replace('%%ROUTE_NAME%%', Str::kebab(Str::plural($modelName)), $controller);
+        $controller = str_replace('%%VIEW_NAME%%', Str::kebab(Str::plural($modelName)), $controller);
+        $controller = str_replace('%%MODEL_NAME%%', Str::ucfirst(Str::camel(Str::singular($modelName))), $controller);
+        $controller = str_replace('%%VARIABLE_PLURAL%%', Str::camel(Str::plural($modelName)), $controller);
+        $controller = str_replace('%%VARIABLE_SINGULAR%%', Str::camel(Str::singular($modelName)), $controller);
+        $controller = str_replace('%%FAKE_DATA%%', $this->getFakeData($jsonSchema), $controller);
+        $controller = str_replace('%%ASSERT_COLUMNS%%', $this->getAssertColumns($jsonSchema, $modelName), $controller);
+
+        // publish
+        file_put_contents(
+            "tests/Feature/Http/Controllers/". Str::ucfirst(Str::camel(Str::singular($modelName))) ."ControllerTest.php",
+            $controller
+        );
     }
-
-    protected static function getInsertStrOf(Column $column) : String {
+    
+    // FIXME: 可読性低い
+    protected function getFakeData(DatabaseSchema $jsonSchema) : String {
+        $tmp = array_map([self::class, 'getInsertStrOf'], $jsonSchema->columns);
+        return rtrim(implode('', $tmp), ",\n\t");
+    }
+    // FIXME: 可読性低い
+    protected function getInsertStrOf(Column $column) : String {
         if($column->type == "id") {
             return "";
         } else if(
@@ -29,7 +45,8 @@ class ControllerTestMaker extends FileMaker {
             is_numeric(explode(":", $column->type)[1])
         ) {
             $length = explode(":", $column->type)[1];
-            return "'{$column->name}' => \$this->faker->lexify(str_repeat('?', " . $length . ")),\n\t\t\t";        } else if($column->type == "integer") {
+            return "'{$column->name}' => \$this->faker->lexify(str_repeat('?', " . $length . ")),\n\t\t\t";        
+        } else if($column->type == "integer") {
             return "'{$column->name}' => \$this->faker->numberBetween(\$min = 1, \$max = 100),\n\t\t\t";
         } else if($column->type == "boolean") {
             return "'{$column->name}' => \$this->faker->boolean,\n\t\t\t";
@@ -46,27 +63,13 @@ class ControllerTestMaker extends FileMaker {
         }
     }
 
-    //TODO:dry化
-    protected static function getInsertStrFor(DatabaseSchema $jsonSchema) : String {
-        $tmp = array_map([self::class, 'getInsertStrOf'], $jsonSchema->columns);
-        return rtrim(implode('', $tmp), ",\n\t");
-    }
-
-    protected static function getInssertAssertStrFor(DatabaseSchema $jsonSchema, String $modelName) : String {
+    // FIXME: 可読性低い
+    protected function getAssertColumns(DatabaseSchema $jsonSchema, String $modelName) : String {
         $func = function($column) use ($modelName) {
-            return self::getInsertAssertStrOf($modelName, $column);
+            $model = Str::camel(Str::singular($modelName));
+            return "'{$column->name}' => \${$model}->{$column->name},\n\t\t\t";
         };
         $tmp = array_map($func, $jsonSchema->columns);
         return rtrim(implode('', $tmp), ",\n\t");
-    }
-
-    private static function getInsertAssertStrOf(String $modelName, Column $column) : String {
-        return "'{$column->name}' => $$modelName->{$column->name},\n\t\t\t";
-    }
-
-    protected static function getFilePathOf(String $modeName): String {
-        $singular = Str::singular($modeName);
-        $upperSingular = Str::ucfirst($singular);
-        return "./tests/Feature/Http/Controllers/{$upperSingular}ControllerTest.php";
     }
 }
