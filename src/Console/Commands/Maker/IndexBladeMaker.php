@@ -27,9 +27,15 @@ class IndexBladeMaker {
         $indexBlade = str_replace('%%TABLE_COLUMNS%%', $this->getTableColumns($jsonSchema), $indexBlade);
         $indexBlade = str_replace('%%TABLE_ROWS%%', $this->getTableRows($jsonSchema, $modelName), $indexBlade);
 
+        // create directory if not exists
+        $dir = "resources/views/". Str::kebab(Str::plural($modelName));
+        if (!file_exists($dir)) {
+            mkdir($dir);
+        }
+
         // publish
         file_put_contents(
-            "resources/views/". Str::kebab(Str::plural($modelName)) ."/index.blade.php",
+            $dir ."/index.blade.php",
             $indexBlade
         );
     }

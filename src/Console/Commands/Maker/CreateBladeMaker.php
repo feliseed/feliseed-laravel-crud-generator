@@ -16,9 +16,15 @@ class CreateBladeMaker {
         $indexBlade = str_replace('%%VARIABLE_SINGULAR%%', "$".Str::camel(Str::singular($modelName)), $indexBlade);
         $indexBlade = str_replace('%%INPUTS%%', $this->getInputs($jsonSchema, $modelName), $indexBlade);
 
+        // create directory if not exists
+        $dir = "resources/views/". Str::kebab(Str::plural($modelName));
+        if (!file_exists($dir)) {
+            mkdir($dir);
+        }
+
         // publish
         file_put_contents(
-            "resources/views/". Str::kebab(Str::plural($modelName)) ."/create.blade.php",
+            $dir ."/create.blade.php",
             $indexBlade
         );
     }
